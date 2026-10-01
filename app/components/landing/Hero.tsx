@@ -5,7 +5,7 @@ export function Hero() {
         <section className="relative overflow-hidden">
             {/* Background glow */}
             <div
-                className="pointer-events-none absolute left-1/2 top-0 -z-0 h-[500px] w-[800px] -translate-x-1/2 rounded-full bg-cyan-500/10 blur-3xl"
+                className="pointer-events-none absolute left-1/2 top-0 z-0 h-125 w-200 -translate-x-1/2 rounded-full bg-cyan-500/10 blur-3xl"
                 aria-hidden="true"
             />
 
