@@ -1,71 +1,63 @@
-import { redirect } from "next/navigation";
-import { auth } from "@/auth";
-import LogoutButton from "../components/LogOutButton";
+import FleetStatCard from "../components/dashboard/FleetStatCard";
 
-export default async function DashboardPage() {
-    const session = await auth();
+const fleetStats = {
+    totalVessels: 24,
+    activeVessels: 18,
+    offlineVessels: 4,
+    vesselsInAlert: 2,
+};
 
-    if (!session?.user) {
-        redirect("/login");
-    }
-
+export default function DashboardPage() {
     return (
-        <main className="min-h-screen bg-zinc-950 text-zinc-100">
-            <div className="mx-auto flex min-h-screen max-w-7xl items-center justify-center px-6 py-12">
-                <section className="w-full max-w-2xl rounded-xl border border-zinc-800 bg-zinc-900/60 p-8 shadow-2xl">
-                    <div className="mb-8">
-                        <div className="mb-6 flex items-center gap-3">
-                            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-cyan-500/10 ring-1 ring-cyan-500/20">
-                                <span className="text-lg font-bold text-cyan-400">
-                                    F
-                                </span>
-                            </div>
+        <div className="p-6 lg:p-8">
+            <div className="mx-auto max-w-7xl">
+                <div className="mb-8">
+                    <p className="text-sm font-medium text-cyan-400">
+                        Dashboard
+                    </p>
 
-                            <div>
-                                <p className="text-sm font-semibold tracking-wide text-zinc-100">
-                                    FleetOps
-                                </p>
-                                <p className="text-xs text-zinc-500">
-                                    Fleet Intelligence Platform
-                                </p>
-                            </div>
-                        </div>
+                    <h1 className="mt-2 text-3xl font-semibold tracking-tight text-zinc-100">
+                        Fleet Overview
+                    </h1>
 
-                        <div className="space-y-2">
-                            <p className="text-sm font-medium text-cyan-400">
-                                Dashboard
-                            </p>
+                    <p className="mt-2 max-w-2xl text-sm text-zinc-400">
+                        Monitor your fleet, track vessel activity, and stay on
+                        top of important alerts.
+                    </p>
+                </div>
 
-                            <h1 className="text-3xl font-semibold tracking-tight">
-                                Welcome back
-                            </h1>
+                <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                    <FleetStatCard
+                        label="Total Vessels"
+                        value={fleetStats.totalVessels}
+                        description="Vessels in your fleet"
+                    />
 
-                            <p className="text-zinc-400">
-                                Monitor your fleet, track vessels, and stay on
-                                top of important alerts.
-                            </p>
-                        </div>
-                    </div>
+                    <FleetStatCard
+                        label="Active"
+                        value={fleetStats.activeVessels}
+                        description="Currently operational"
+                    />
 
-                    <div className="mb-8 rounded-lg border border-zinc-800 bg-zinc-950/60 p-5">
-                        <p className="mb-1 text-xs font-medium uppercase tracking-wider text-zinc-500">
-                            Signed in as
-                        </p>
+                    <FleetStatCard
+                        label="Offline"
+                        value={fleetStats.offlineVessels}
+                        description="Not reporting data"
+                    />
 
-                        <p className="text-sm text-zinc-200">
-                            {session.user.email}
-                        </p>
-                    </div>
+                    <FleetStatCard
+                        label="In Alert"
+                        value={fleetStats.vesselsInAlert}
+                        description="Require attention"
+                    />
+                </div>
 
-                    <div className="flex items-center justify-between border-t border-zinc-800 pt-6">
-                        <p className="text-sm text-zinc-500">
-                            FleetOps dashboard
-                        </p>
-
-                        <LogoutButton />
-                    </div>
-                </section>
+                <div className="mt-6 rounded-xl border border-zinc-800 bg-zinc-900/50 p-8">
+                    <p className="text-sm text-zinc-500">
+                        Vessel activity and map will go here.
+                    </p>
+                </div>
             </div>
-        </main>
+        </div>
     );
 }
