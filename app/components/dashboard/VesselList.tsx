@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { mockVessels } from "../../data/mock-vessels";
 
 const columns = ["Vessel", "Status", "Speed", "Heading", "Last Update"];
@@ -58,13 +59,18 @@ export default function VesselList() {
                                 className="transition-colors hover:bg-zinc-800/30"
                             >
                                 <td className="px-5 py-4">
-                                    <p className="text-sm font-medium text-zinc-100">
-                                        {vessel.name}
-                                    </p>
+                                    <Link
+                                        href={`/dashboard/vessels/${vessel.id}`}
+                                        className="group"
+                                    >
+                                        <p className="text-sm font-medium text-zinc-100 transition-colors group-hover:text-cyan-400">
+                                            {vessel.name}
+                                        </p>
 
-                                    <p className="mt-1 text-xs text-zinc-500">
-                                        IMO {vessel.imo}
-                                    </p>
+                                        <p className="mt-1 text-xs text-zinc-500">
+                                            IMO {vessel.imo}
+                                        </p>
+                                    </Link>
                                 </td>
 
                                 <td className="px-5 py-4">
