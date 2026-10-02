@@ -4,10 +4,10 @@ export function CTA() {
     return (
         <section className="border-t border-white/10">
             <div className="mx-auto max-w-7xl px-6 py-24">
-                <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] px-6 py-16 text-center sm:px-12">
+                <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/3 px-6 py-16 text-center sm:px-12">
                     {/* Background glow */}
                     <div
-                        className="pointer-events-none absolute left-1/2 top-0 -z-0 h-64 w-96 -translate-x-1/2 rounded-full bg-cyan-500/10 blur-3xl"
+                        className="pointer-events-none absolute left-1/2 top-0 z-0 h-64 w-96 -translate-x-1/2 rounded-full bg-cyan-500/10 blur-3xl"
                         aria-hidden="true"
                     />
 
