@@ -1,4 +1,4 @@
-import DashboardFleetView from "../components/dashboard/DashboardFleetView";
+import DashboardFleetView from "../components/dashboard/FleetView";
 import FleetStatCard from "../components/dashboard/FleetStatCard";
 import { mockVessels } from "../data/mock-vessels";
 

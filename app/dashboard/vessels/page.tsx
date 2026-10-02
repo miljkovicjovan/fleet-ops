@@ -1,4 +1,4 @@
-import VesselList from "../../components/dashboard/VesselList";
+import FleetView from "@/app/components/dashboard/FleetView";
 
 export default function VesselsPage() {
     return (
@@ -18,7 +18,7 @@ export default function VesselsPage() {
                     </p>
                 </div>
 
-                <VesselList />
+                <FleetView />
             </div>
         </div>
     );
