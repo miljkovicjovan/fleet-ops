@@ -24,3 +24,207 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* FleetOps Map */
+.fleetops-map {
+    position: relative;
+}
+
+.fleetops-map .mapboxgl-canvas {
+    outline: none;
+}
+
+/* Vessel marker */
+.fleetops-vessel-marker {
+    display: flex;
+    position: relative;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+}
+
+.fleetops-vessel-marker__ring {
+    position: absolute;
+    width: 28px;
+    height: 28px;
+    border: 1px solid;
+    border-radius: 9999px;
+}
+
+.fleetops-vessel-marker__dot {
+    position: relative;
+    width: 10px;
+    height: 10px;
+    border-radius: 9999px;
+}
+
+/* Active */
+.fleetops-vessel-marker--active
+    .fleetops-vessel-marker__ring {
+    border-color: rgb(34 211 238 / 0.4);
+    background: rgb(34 211 238 / 0.12);
+}
+
+.fleetops-vessel-marker--active
+    .fleetops-vessel-marker__dot {
+    background: rgb(34 211 238);
+    box-shadow: 0 0 12px rgb(34 211 238 / 0.5);
+}
+
+/* Offline */
+.fleetops-vessel-marker--offline
+    .fleetops-vessel-marker__ring {
+    border-color: rgb(248 113 113 / 0.4);
+    background: rgb(248 113 113 / 0.12);
+}
+
+.fleetops-vessel-marker--offline
+    .fleetops-vessel-marker__dot {
+    background: rgb(248 113 113);
+    box-shadow: 0 0 12px rgb(248 113 113 / 0.4);
+}
+
+/* Inactive */
+.fleetops-vessel-marker--inactive
+    .fleetops-vessel-marker__ring {
+    border-color: rgb(113 113 122 / 0.4);
+    background: rgb(113 113 122 / 0.12);
+}
+
+.fleetops-vessel-marker--inactive
+    .fleetops-vessel-marker__dot {
+    background: rgb(113 113 122);
+}
+
+/* Popup */
+.fleetops-popup .mapboxgl-popup-content {
+    padding: 14px;
+    border: 1px solid rgb(39 39 42);
+    border-radius: 12px;
+    background: rgb(9 9 11);
+    color: rgb(244 244 245);
+    box-shadow: 0 10px 30px rgb(0 0 0 / 0.4);
+}
+
+.fleetops-popup .mapboxgl-popup-tip {
+    border-top-color: rgb(9 9 11);
+}
+
+.fleetops-popup .mapboxgl-popup-close-button {
+    top: 6px;
+    right: 8px;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    color: rgb(113 113 122);
+    font-size: 18px;
+    line-height: 28px;
+}
+
+.fleetops-popup .mapboxgl-popup-close-button:hover {
+    background: rgb(39 39 42 / 0.5);
+    color: rgb(244 244 245);
+}
+
+/* Popup vessel header */
+.fleetops-popup__header {
+    margin-bottom: 14px;
+}
+
+.fleetops-popup__name {
+    display: block;
+    margin: 0;
+    color: rgb(244 244 245);
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    outline: none;
+}
+
+.fleetops-popup__name:hover {
+    color: rgb(34 211 238);
+}
+
+.fleetops-popup__name:focus,
+.fleetops-popup__name:focus-visible {
+    outline: none;
+    box-shadow: none;
+}
+
+.fleetops-popup__status {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 5px;
+    font-size: 11px;
+    text-transform: capitalize;
+}
+
+.fleetops-popup__status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 9999px;
+}
+
+.fleetops-popup__status--active {
+    color: rgb(34 211 238);
+}
+
+.fleetops-popup__status--active
+    .fleetops-popup__status-dot {
+    background: rgb(34 211 238);
+    box-shadow: 0 0 6px rgb(34 211 238 / 0.5);
+}
+
+.fleetops-popup__status--offline {
+    color: rgb(248 113 113);
+}
+
+.fleetops-popup__status--offline
+    .fleetops-popup__status-dot {
+    background: rgb(248 113 113);
+}
+
+.fleetops-popup__status--inactive {
+    color: rgb(113 113 122);
+}
+
+.fleetops-popup__status--inactive
+    .fleetops-popup__status-dot {
+    background: rgb(113 113 122);
+}
+
+.fleetops-popup__imo {
+    margin: 4px 0 0;
+    color: rgb(113 113 122);
+    font-size: 11px;
+}
+
+/* Popup metrics */
+.fleetops-popup__metrics {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+.fleetops-popup__metric {
+    padding: 10px;
+    border: 1px solid rgb(39 39 42);
+    border-radius: 8px;
+    background: rgb(24 24 27);
+}
+
+.fleetops-popup__metric-label {
+    margin: 0;
+    color: rgb(113 113 122);
+    font-size: 10px;
+}
+
+.fleetops-popup__metric-value {
+    margin: 4px 0 0;
+    color: rgb(228 228 231);
+    font-size: 13px;
+    font-weight: 600;
+}

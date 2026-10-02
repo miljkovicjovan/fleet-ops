@@ -1,3 +1,4 @@
+import FleetMap from "../components/dashboard/FleetMap";
 import FleetStatCard from "../components/dashboard/FleetStatCard";
 import VesselList from "../components/dashboard/VesselList";
 import { mockVessels } from "../data/mock-vessels";
@@ -56,6 +57,10 @@ export default function DashboardPage() {
                         value={fleetStats.vesselsInAlert}
                         description="Require attention"
                     />
+                </div>
+
+                <div className="mt-6">
+                    <FleetMap />
                 </div>
 
                 <div className="mt-6">
