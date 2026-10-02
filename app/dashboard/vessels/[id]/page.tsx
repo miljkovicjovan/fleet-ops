@@ -23,10 +23,10 @@ export default async function VesselPage({
         <div className="p-6 lg:p-8">
             <div className="mx-auto max-w-7xl">
                 <Link
-                    href="/dashboard"
+                    href="/dashboard/vessels"
                     className="text-sm text-zinc-500 transition-colors hover:text-cyan-400"
                 >
-                    ← Back to Dashboard
+                    ← Back to Vessels
                 </Link>
 
                 <div className="mt-6">

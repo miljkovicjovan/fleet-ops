@@ -1,13 +1,20 @@
+"use client";
+
 import Link from "next/link";
+import { useMemo, useState } from "react";
 import { mockVessels } from "../../data/mock-vessels";
+import type { VesselStatus } from "../../types/vessel";
 
 const columns = ["Vessel", "Status", "Speed", "Heading", "Last Update"];
 
-function StatusIndicator({
-    status,
-}: {
-    status: "active" | "offline" | "inactive";
-}) {
+const statusOptions: Array<"all" | VesselStatus> = [
+    "all",
+    "active",
+    "offline",
+    "inactive",
+];
+
+function StatusIndicator({ status }: { status: VesselStatus }) {
     const color = {
         active: "bg-cyan-400",
         offline: "bg-red-400",
@@ -17,6 +24,7 @@ function StatusIndicator({
     return (
         <div className="flex items-center gap-2">
             <span className={`h-2 w-2 rounded-full ${color}`} />
+
             <span className="text-sm capitalize text-zinc-300">
                 {status}
             </span>
@@ -25,16 +33,67 @@ function StatusIndicator({
 }
 
 export default function VesselList() {
+    const [search, setSearch] = useState("");
+    const [status, setStatus] = useState<"all" | VesselStatus>("all");
+
+    const filteredVessels = useMemo(() => {
+        return mockVessels.filter((vessel) => {
+            const matchesSearch =
+                vessel.name.toLowerCase().includes(search.toLowerCase()) ||
+                vessel.imo.includes(search);
+
+            const matchesStatus =
+                status === "all" || vessel.status === status;
+
+            return matchesSearch && matchesStatus;
+        });
+    }, [search, status]);
+
     return (
         <div className="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900/50">
             <div className="border-b border-zinc-800 px-5 py-4">
-                <h2 className="text-sm font-semibold text-zinc-100">
-                    Fleet Vessels
-                </h2>
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                        <h2 className="text-sm font-semibold text-zinc-100">
+                            Fleet Vessels
+                        </h2>
 
-                <p className="mt-1 text-xs text-zinc-500">
-                    Current status and telemetry for your vessels.
-                </p>
+                        <p className="mt-1 text-xs text-zinc-500">
+                            {filteredVessels.length} of {mockVessels.length}{" "}
+                            vessels
+                        </p>
+                    </div>
+
+                    <div className="flex flex-col gap-2 sm:flex-row">
+                        <input
+                            type="search"
+                            value={search}
+                            onChange={(event) =>
+                                setSearch(event.target.value)
+                            }
+                            placeholder="Search vessel or IMO..."
+                            className="h-9 rounded-lg border border-zinc-800 bg-zinc-950 px-3 text-sm text-zinc-100 outline-none placeholder:text-zinc-600 focus:border-cyan-400/50"
+                        />
+
+                        <select
+                            value={status}
+                            onChange={(event) =>
+                                setStatus(
+                                    event.target.value as
+                                    | "all"
+                                    | VesselStatus
+                                )
+                            }
+                            className="h-9 rounded-lg border border-zinc-800 bg-zinc-950 px-3 text-sm capitalize text-zinc-300 outline-none focus:border-cyan-400/50"
+                        >
+                            {statusOptions.map((option) => (
+                                <option key={option} value={option}>
+                                    {option === "all" ? "All Statuses" : option}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                </div>
             </div>
 
             <div className="overflow-x-auto">
@@ -53,7 +112,7 @@ export default function VesselList() {
                     </thead>
 
                     <tbody className="divide-y divide-zinc-800">
-                        {mockVessels.map((vessel) => (
+                        {filteredVessels.map((vessel) => (
                             <tr
                                 key={vessel.id}
                                 className="transition-colors hover:bg-zinc-800/30"
@@ -74,7 +133,9 @@ export default function VesselList() {
                                 </td>
 
                                 <td className="px-5 py-4">
-                                    <StatusIndicator status={vessel.status} />
+                                    <StatusIndicator
+                                        status={vessel.status}
+                                    />
                                 </td>
 
                                 <td className="px-5 py-4 text-sm text-zinc-300">
@@ -98,6 +159,18 @@ export default function VesselList() {
                     </tbody>
                 </table>
             </div>
+
+            {filteredVessels.length === 0 && (
+                <div className="px-5 py-12 text-center">
+                    <p className="text-sm text-zinc-400">
+                        No vessels found.
+                    </p>
+
+                    <p className="mt-1 text-xs text-zinc-600">
+                        Try changing your search or status filter.
+                    </p>
+                </div>
+            )}
         </div>
     );
 }
