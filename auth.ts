@@ -16,8 +16,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                     return null;
                 }
 
-                await db.connect();
-
                 const user = await db.orm.public.User
                     .where({
                         email: credentials.email as string,
