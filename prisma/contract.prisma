@@ -7,3 +7,21 @@ model User {
     createdAt    TimestamptzString
     updatedAt    TimestamptzString
 }
+
+model Vessel {
+    id          String        @id
+    name        String
+    imo         String        @unique
+    status      VesselStatus
+    latitude    Float
+    longitude   Float
+    speed       Float
+    heading     Float
+    lastUpdated TimestamptzString
+}
+
+enum VesselStatus {
+    active
+    offline
+    inactive
+}

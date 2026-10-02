@@ -1,0 +1,83 @@
+[
+  {
+    "id": "table.Vessel",
+    "label": "Create table \"Vessel\"",
+    "summary": "Creates table \"Vessel\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "Vessel"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"Vessel\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Vessel\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"Vessel\"",
+        "sql": "CREATE TABLE \"public\".\"Vessel\" (\n  \"heading\" float8 NOT NULL,\n  \"id\" text NOT NULL,\n  \"imo\" text NOT NULL,\n  \"lastUpdated\" timestamptz NOT NULL,\n  \"latitude\" float8 NOT NULL,\n  \"longitude\" float8 NOT NULL,\n  \"name\" text NOT NULL,\n  \"speed\" float8 NOT NULL,\n  \"status\" text NOT NULL,\n  PRIMARY KEY (\"id\"),\n  CONSTRAINT \"Vessel_status_check_ccac42f6\" CHECK (\"status\" IN ('active', 'offline', 'inactive'))\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"Vessel\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Vessel\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.Vessel.Vessel_imo_key",
+    "label": "Add unique constraint on \"Vessel\" (imo)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "Vessel_imo_key",
+        "table": "Vessel"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"Vessel_imo_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "Vessel_imo_key",
+          "public",
+          "\"public\".\"Vessel\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"Vessel_imo_key\"",
+        "sql": "ALTER TABLE \"public\".\"Vessel\" ADD CONSTRAINT \"Vessel_imo_key\" UNIQUE (\"imo\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"Vessel_imo_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "Vessel_imo_key",
+          "public",
+          "\"public\".\"Vessel\""
+        ]
+      }
+    ]
+  }
+]
