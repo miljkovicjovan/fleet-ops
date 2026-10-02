@@ -1,4 +1,5 @@
 import FleetStatCard from "../components/dashboard/FleetStatCard";
+import VesselList from "../components/dashboard/VesselList";
 import { mockVessels } from "../data/mock-vessels";
 
 const fleetStats = {
@@ -57,10 +58,8 @@ export default function DashboardPage() {
                     />
                 </div>
 
-                <div className="mt-6 rounded-xl border border-zinc-800 bg-zinc-900/50 p-8">
-                    <p className="text-sm text-zinc-500">
-                        Vessel activity and map will go here.
-                    </p>
+                <div className="mt-6">
+                    <VesselList />
                 </div>
             </div>
         </div>
