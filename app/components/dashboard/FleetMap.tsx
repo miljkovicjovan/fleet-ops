@@ -20,10 +20,18 @@ function getMarkerColor(status: VesselStatus) {
     }
 }
 
-function createVesselMarker(status: VesselStatus) {
+function createVesselMarker(
+    status: VesselStatus,
+    heading: number
+) {
     const element = document.createElement("div");
 
     element.className = `fleetops-vessel-marker fleetops-vessel-marker--${status}`;
+
+    element.style.setProperty(
+        "--vessel-heading",
+        `${heading}deg`
+    );
 
     element.innerHTML = `
         <div class="fleetops-vessel-marker__ring"></div>
@@ -110,7 +118,10 @@ export default function FleetMap({
         });
 
         mockVessels.forEach((vessel) => {
-            const markerElement = createVesselMarker(vessel.status);
+            const markerElement = createVesselMarker(
+                vessel.status,
+                vessel.heading
+            );
 
             markerElement.addEventListener("click", () => {
                 onVesselSelect(vessel.id);
