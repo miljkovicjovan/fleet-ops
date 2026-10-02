@@ -22,7 +22,7 @@ export default async function DashboardLayout({
                     }}
                 />
 
-                <main className="min-w-0 flex-1">
+                <main className="min-w-0 flex-1 lg:ml-64">
                     {children}
                 </main>
             </div>

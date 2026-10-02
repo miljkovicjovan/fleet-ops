@@ -33,7 +33,7 @@ export default function Sidebar({ user }: SidebarProps) {
     const pathname = usePathname();
 
     return (
-        <aside className="flex w-64 shrink-0 flex-col border-r border-zinc-800 bg-zinc-950">
+        <aside className="fixed inset-y-0 left-0 z-40 flex h-screen w-64 shrink-0 flex-col border-r border-zinc-800 bg-zinc-950">
             <div className="flex h-16 items-center border-b border-zinc-800 px-6">
                 <Link href="/dashboard" className="flex items-center gap-3">
                     <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-cyan-400/10 ring-1 ring-cyan-400/20">
@@ -70,10 +70,10 @@ export default function Sidebar({ user }: SidebarProps) {
                             <Link
                                 key={item.href}
                                 href={item.href}
-                                className={`flex items - center rounded - lg px - 3 py - 2.5 text - sm font - medium transition - colors ${isActive
-                                        ? "bg-cyan-400/10 text-cyan-400"
-                                        : "text-zinc-400 hover:bg-zinc-900 hover:text-zinc-100"
-                                    } `}
+                                className={`flex items-center rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${isActive
+                                    ? "bg-cyan-400/10 text-cyan-400"
+                                    : "text-zinc-400 hover:bg-zinc-900 hover:text-zinc-100"
+                                    }`}
                             >
                                 {item.name}
                             </Link>
