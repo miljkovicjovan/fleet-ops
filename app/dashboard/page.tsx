@@ -1,9 +1,14 @@
 import FleetStatCard from "../components/dashboard/FleetStatCard";
+import { mockVessels } from "../data/mock-vessels";
 
 const fleetStats = {
-    totalVessels: 24,
-    activeVessels: 18,
-    offlineVessels: 4,
+    totalVessels: mockVessels.length,
+    activeVessels: mockVessels.filter(
+        (vessel) => vessel.status === "active"
+    ).length,
+    offlineVessels: mockVessels.filter(
+        (vessel) => vessel.status === "offline"
+    ).length,
     vesselsInAlert: 2,
 };
 
