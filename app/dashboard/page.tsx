@@ -1,19 +1,29 @@
+"use client";
+
 import DashboardFleetView from "../components/dashboard/FleetView";
 import FleetStatCard from "../components/dashboard/FleetStatCard";
-import { mockVessels } from "../data/mock-vessels";
-
-const fleetStats = {
-    totalVessels: mockVessels.length,
-    activeVessels: mockVessels.filter(
-        (vessel) => vessel.status === "active"
-    ).length,
-    offlineVessels: mockVessels.filter(
-        (vessel) => vessel.status === "offline"
-    ).length,
-    vesselsInAlert: 2,
-};
+import { useEffect, useState } from "react";
+import { Vessel } from "../types/vessel";
 
 export default function DashboardPage() {
+    const [vessels, setVessels] = useState<Vessel[]>([]);
+
+    useEffect(() => {
+        async function fetchVessels() {
+            const response = await fetch("/api/vessels");
+
+            if (!response.ok) {
+                throw new Error("Failed to fetch vessels");
+            }
+
+            const data: Vessel[] = await response.json();
+
+            setVessels(data);
+        }
+
+        fetchVessels();
+    }, []);
+
     return (
         <div className="p-6 lg:p-8">
             <div className="mx-auto max-w-7xl">
@@ -35,25 +45,25 @@ export default function DashboardPage() {
                 <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
                     <FleetStatCard
                         label="Total Vessels"
-                        value={fleetStats.totalVessels}
+                        value={vessels.length}
                         description="Vessels in your fleet"
                     />
 
                     <FleetStatCard
                         label="Active"
-                        value={fleetStats.activeVessels}
+                        value={vessels.filter((vessel) => vessel.status === "active").length}
                         description="Currently operational"
                     />
 
                     <FleetStatCard
                         label="Offline"
-                        value={fleetStats.offlineVessels}
+                        value={vessels.filter((vessel) => vessel.status === "offline").length}
                         description="Not reporting data"
                     />
 
                     <FleetStatCard
                         label="In Alert"
-                        value={fleetStats.vesselsInAlert}
+                        value={2}
                         description="Require attention"
                     />
                 </div>

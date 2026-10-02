@@ -50,7 +50,7 @@ export function Features() {
                     {features.map((feature) => (
                         <article
                             key={feature.number}
-                            className="bg-[#0a0a0a] p-8 transition-colors hover:bg-white/[0.03] sm:p-10"
+                            className="bg-[#0a0a0a] p-8 transition-colors hover:bg-white/3 sm:p-10"
                         >
                             <span className="text-sm font-medium text-white/30">
                                 {feature.number}

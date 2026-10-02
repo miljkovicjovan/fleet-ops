@@ -1,24 +1,13 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 
-import { mockVessels } from "../../data/mock-vessels";
-import type { VesselStatus } from "../../types/vessel";
+import type { Vessel, VesselStatus } from "../../types/vessel";
 
 mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN!;
-
-function getMarkerColor(status: VesselStatus) {
-    switch (status) {
-        case "active":
-            return "#22d3ee";
-        case "offline":
-            return "#f87171";
-        case "inactive":
-            return "#71717a";
-    }
-}
 
 function createVesselMarker(
     status: VesselStatus,
@@ -95,29 +84,98 @@ function createPopupContent(
 type FleetMapProps = {
     selectedVesselId: string | null;
     onVesselSelect: (vesselId: string) => void;
+    vessels: Vessel[];
+    onReload: () => void;
+    isReloading: boolean;
 };
 
 export default function FleetMap({
     selectedVesselId,
     onVesselSelect,
+    vessels,
+    onReload,
+    isReloading,
 }: FleetMapProps) {
     const mapContainer = useRef<HTMLDivElement | null>(null);
-    const map = useRef<mapboxgl.Map | null>(null);
-    const markers = useRef<Map<string, mapboxgl.Marker>>(new Map());
 
+    const map = useRef<mapboxgl.Map | null>(null);
+
+    const markers = useRef<Map<string, mapboxgl.Marker>>(
+        new Map()
+    );
+
+    const [mapReady, setMapReady] = useState(false);
+
+    /*
+     * Initialize Mapbox once.
+     */
     useEffect(() => {
         if (!mapContainer.current || map.current) {
             return;
         }
 
-        map.current = new mapboxgl.Map({
+        const mapInstance = new mapboxgl.Map({
             container: mapContainer.current,
             style: "mapbox://styles/mapbox/dark-v11",
             center: [15, 45],
             zoom: 3,
         });
 
-        mockVessels.forEach((vessel) => {
+        map.current = mapInstance;
+
+        const handleLoad = () => {
+            setMapReady(true);
+        };
+
+        mapInstance.once("load", handleLoad);
+
+        return () => {
+            mapInstance.off("load", handleLoad);
+            mapInstance.remove();
+
+            map.current = null;
+            markers.current.clear();
+            setMapReady(false);
+        };
+    }, []);
+
+    /*
+     * Synchronize vessel markers with vessel data.
+     *
+     * The Mapbox map is never recreated here.
+     */
+    useEffect(() => {
+        const currentMap = map.current;
+
+        if (!currentMap || !mapReady) {
+            return;
+        }
+
+        /*
+         * Create markers for new vessels.
+         */
+        vessels.forEach((vessel) => {
+            const existingMarker = markers.current.get(
+                vessel.id
+            );
+
+            if (existingMarker) {
+                /*
+                 * Existing marker:
+                 * only update its geographic position.
+                 */
+                existingMarker.setLngLat([
+                    vessel.longitude,
+                    vessel.latitude,
+                ]);
+
+                return;
+            }
+
+            /*
+             * New vessel:
+             * create its marker.
+             */
             const markerElement = createVesselMarker(
                 vessel.status,
                 vessel.heading
@@ -130,7 +188,10 @@ export default function FleetMap({
             const marker = new mapboxgl.Marker({
                 element: markerElement,
             })
-                .setLngLat([vessel.longitude, vessel.latitude])
+                .setLngLat([
+                    vessel.longitude,
+                    vessel.latitude,
+                ])
                 .setPopup(
                     new mapboxgl.Popup({
                         offset: 20,
@@ -148,19 +209,37 @@ export default function FleetMap({
                         )
                     )
                 )
-                .addTo(map.current!);
+                .addTo(currentMap);
 
             markers.current.set(vessel.id, marker);
         });
 
-        return () => {
-            map.current?.remove();
-            map.current = null;
-        };
-    }, []);
+        /*
+         * Remove markers for vessels that no longer exist.
+         */
+        markers.current.forEach((marker, vesselId) => {
+            const vesselExists = vessels.some(
+                (vessel) => vessel.id === vesselId
+            );
 
+            if (!vesselExists) {
+                marker.remove();
+                markers.current.delete(vesselId);
+            }
+        });
+    }, [vessels, mapReady, onVesselSelect]);
+
+    /*
+     * Handle vessel selection.
+     */
     useEffect(() => {
-        if (!map.current || !selectedVesselId) {
+        const currentMap = map.current;
+
+        if (
+            !currentMap ||
+            !mapReady ||
+            !selectedVesselId
+        ) {
             return;
         }
 
@@ -173,18 +252,23 @@ export default function FleetMap({
             );
         });
 
-        const vessel = mockVessels.find(
+        const vessel = vessels.find(
             (vessel) => vessel.id === selectedVesselId
         );
 
-        const marker = markers.current.get(selectedVesselId);
+        const marker = markers.current.get(
+            selectedVesselId
+        );
 
         if (!vessel || !marker) {
             return;
         }
 
-        map.current.flyTo({
-            center: [vessel.longitude, vessel.latitude],
+        currentMap.flyTo({
+            center: [
+                vessel.longitude,
+                vessel.latitude,
+            ],
             zoom: 6,
             duration: 1000,
         });
@@ -194,11 +278,26 @@ export default function FleetMap({
         });
 
         marker.togglePopup();
-    }, [selectedVesselId]);
+    }, [
+        selectedVesselId,
+        vessels,
+        mapReady,
+    ]);
+
+    /*
+     * Reload vessel data.
+     *
+     * We deliberately do NOT remove the markers here.
+     * The updated vessel data will cause the synchronization
+     * effect above to move existing markers.
+     */
+    const handleReload = () => {
+        onReload();
+    };
 
     return (
         <div className="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900/50">
-            <div className="border-b border-zinc-800 px-5 py-4">
+            <div className="flex items-center justify-between border-b border-zinc-800 px-5 py-4">
                 <div>
                     <h2 className="text-sm font-semibold text-zinc-100">
                         Fleet Map
@@ -208,6 +307,15 @@ export default function FleetMap({
                         Current vessel positions
                     </p>
                 </div>
+
+                <button
+                    type="button"
+                    onClick={handleReload}
+                    disabled={isReloading}
+                    className="rounded-md border border-zinc-700 bg-zinc-800 px-3 py-1.5 text-xs font-medium text-zinc-300 transition-colors hover:bg-zinc-700 hover:text-zinc-100 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                    {isReloading ? "Reloading..." : "Reload"}
+                </button>
             </div>
 
             <div

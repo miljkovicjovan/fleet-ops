@@ -2,8 +2,7 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { mockVessels } from "../../data/mock-vessels";
-import type { VesselStatus } from "../../types/vessel";
+import type { Vessel, VesselStatus } from "../../types/vessel";
 
 const columns = ["Vessel", "Status", "Speed", "Heading", "Last Update"];
 
@@ -20,6 +19,7 @@ type SortDirection = "asc" | "desc";
 type VesselListProps = {
     selectedVesselId?: string | null;
     onVesselSelect?: (vesselId: string) => void;
+    vessels: Vessel[];
 };
 
 function StatusIndicator({ status }: { status: VesselStatus }) {
@@ -43,6 +43,7 @@ function StatusIndicator({ status }: { status: VesselStatus }) {
 export default function VesselList({
     selectedVesselId,
     onVesselSelect,
+    vessels
 }: VesselListProps) {
     const [search, setSearch] = useState("");
     const [status, setStatus] = useState<"all" | VesselStatus>("all");
@@ -51,7 +52,7 @@ export default function VesselList({
         useState<SortDirection>("asc");
 
     const filteredVessels = useMemo(() => {
-        const vessels = mockVessels.filter((vessel) => {
+        const filteredVessels = vessels.filter((vessel) => {
             const matchesSearch =
                 vessel.name.toLowerCase().includes(search.toLowerCase()) ||
                 vessel.imo.includes(search);
@@ -62,7 +63,7 @@ export default function VesselList({
             return matchesSearch && matchesStatus;
         });
 
-        return vessels.sort((a, b) => {
+        return filteredVessels.sort((a, b) => {
             const aValue = a[sortKey];
             const bValue = b[sortKey];
 
@@ -82,7 +83,7 @@ export default function VesselList({
 
             return 0;
         });
-    }, [search, status, sortKey, sortDirection]);
+    }, [vessels, search, status, sortKey, sortDirection]);
 
     const handleSort = (key: SortKey) => {
         if (sortKey === key) {
@@ -107,7 +108,7 @@ export default function VesselList({
                         </h2>
 
                         <p className="mt-1 text-xs text-zinc-500">
-                            {filteredVessels.length} of {mockVessels.length}{" "}
+                            {filteredVessels.length} of {vessels.length}{" "}
                             vessels
                         </p>
                     </div>
@@ -201,7 +202,7 @@ export default function VesselList({
                                 <td className="px-5 py-4">
                                     <Link
                                         href={`/dashboard/vessels/${vessel.id}`}
-                                        className="group"
+                                        className="group inline-block"
                                     >
                                         <p className="text-sm font-medium text-zinc-100 transition-colors group-hover:text-cyan-400">
                                             {vessel.name}

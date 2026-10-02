@@ -1,22 +1,98 @@
+"use client";
+
+import { Vessel } from "@/app/types/vessel";
 import Link from "next/link";
-import { notFound } from "next/navigation";
-import { mockVessels } from "../../../data/mock-vessels";
+import { useParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
-type VesselPageProps = {
-    params: Promise<{
-        id: string;
-    }>;
-};
+export default function VesselPage() {
+    const params = useParams();
+    const id = params.id as string;
 
-export default async function VesselPage({
-    params,
-}: VesselPageProps) {
-    const { id } = await params;
+    const [vessel, setVessel] = useState<Vessel | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
-    const vessel = mockVessels.find((vessel) => vessel.id === id);
+    useEffect(() => {
+        async function fetchVessel() {
+            try {
+                const response = await fetch(
+                    `/api/vessels/${id}`
+                );
 
-    if (!vessel) {
-        notFound();
+                if (response.status === 404) {
+                    setError("Vessel not found.");
+                    return;
+                }
+
+                if (!response.ok) {
+                    throw new Error(
+                        "Failed to fetch vessel"
+                    );
+                }
+
+                const data: Vessel =
+                    await response.json();
+
+                setVessel(data);
+            } catch {
+                setError(
+                    "Failed to load vessel information."
+                );
+            } finally {
+                setIsLoading(false);
+            }
+        }
+
+        fetchVessel();
+    }, [id]);
+
+    if (isLoading) {
+        return (
+            <div className="p-6 lg:p-8">
+                <div className="mx-auto max-w-7xl">
+                    <div className="h-4 w-32 animate-pulse rounded bg-zinc-800" />
+
+                    <div className="mt-6 h-9 w-64 animate-pulse rounded bg-zinc-800" />
+
+                    <div className="mt-2 h-4 w-40 animate-pulse rounded bg-zinc-800" />
+
+                    <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                        {Array.from({ length: 4 }).map(
+                            (_, index) => (
+                                <div
+                                    key={index}
+                                    className="h-28 animate-pulse rounded-xl border border-zinc-800 bg-zinc-900/50"
+                                />
+                            )
+                        )}
+                    </div>
+
+                    <div className="mt-6 h-40 animate-pulse rounded-xl border border-zinc-800 bg-zinc-900/50" />
+                </div>
+            </div>
+        );
+    }
+
+    if (error || !vessel) {
+        return (
+            <div className="p-6 lg:p-8">
+                <div className="mx-auto max-w-7xl">
+                    <Link
+                        href="/dashboard/vessels"
+                        className="text-sm text-zinc-500 transition-colors hover:text-cyan-400"
+                    >
+                        ← Back to Vessels
+                    </Link>
+
+                    <div className="mt-8 rounded-xl border border-zinc-800 bg-zinc-900/50 p-6">
+                        <p className="text-sm text-red-400">
+                            {error ?? "Vessel not found."}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        );
     }
 
     return (
