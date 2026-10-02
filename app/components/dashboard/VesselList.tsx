@@ -14,6 +14,9 @@ const statusOptions: Array<"all" | VesselStatus> = [
     "inactive",
 ];
 
+type SortKey = "name" | "status" | "speed" | "heading" | "lastUpdated";
+type SortDirection = "asc" | "desc";
+
 function StatusIndicator({ status }: { status: VesselStatus }) {
     const color = {
         active: "bg-cyan-400",
@@ -35,9 +38,12 @@ function StatusIndicator({ status }: { status: VesselStatus }) {
 export default function VesselList() {
     const [search, setSearch] = useState("");
     const [status, setStatus] = useState<"all" | VesselStatus>("all");
+    const [sortKey, setSortKey] = useState<SortKey>("name");
+    const [sortDirection, setSortDirection] =
+        useState<SortDirection>("asc");
 
     const filteredVessels = useMemo(() => {
-        return mockVessels.filter((vessel) => {
+        const vessels = mockVessels.filter((vessel) => {
             const matchesSearch =
                 vessel.name.toLowerCase().includes(search.toLowerCase()) ||
                 vessel.imo.includes(search);
@@ -47,7 +53,41 @@ export default function VesselList() {
 
             return matchesSearch && matchesStatus;
         });
-    }, [search, status]);
+
+        return vessels.sort((a, b) => {
+            const aValue = a[sortKey];
+            const bValue = b[sortKey];
+
+            if (typeof aValue === "string" && typeof bValue === "string") {
+                return sortDirection === "asc"
+                    ? aValue.localeCompare(bValue)
+                    : bValue.localeCompare(aValue);
+            }
+
+            if (aValue < bValue) {
+                return sortDirection === "asc" ? -1 : 1;
+            }
+
+            if (aValue > bValue) {
+                return sortDirection === "asc" ? 1 : -1;
+            }
+
+            return 0;
+        });
+    }, [search, status, sortKey, sortDirection]);
+
+    const handleSort = (key: SortKey) => {
+        if (sortKey === key) {
+            setSortDirection((current) =>
+                current === "asc" ? "desc" : "asc"
+            );
+
+            return;
+        }
+
+        setSortKey(key);
+        setSortDirection("asc");
+    };
 
     return (
         <div className="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900/50">
@@ -88,7 +128,9 @@ export default function VesselList() {
                         >
                             {statusOptions.map((option) => (
                                 <option key={option} value={option}>
-                                    {option === "all" ? "All Statuses" : option}
+                                    {option === "all"
+                                        ? "All Statuses"
+                                        : option}
                                 </option>
                             ))}
                         </select>
@@ -100,14 +142,41 @@ export default function VesselList() {
                 <table className="w-full text-left">
                     <thead className="border-b border-zinc-800 bg-zinc-950/40">
                         <tr>
-                            {columns.map((column) => (
-                                <th
-                                    key={column}
-                                    className="px-5 py-3 text-xs font-medium uppercase tracking-wide text-zinc-500"
-                                >
-                                    {column}
-                                </th>
-                            ))}
+                            {columns.map((column) => {
+                                const sortKeyMap: Record<string, SortKey> = {
+                                    Vessel: "name",
+                                    Status: "status",
+                                    Speed: "speed",
+                                    Heading: "heading",
+                                    "Last Update": "lastUpdated",
+                                };
+
+                                const key = sortKeyMap[column];
+                                const isSorted = sortKey === key;
+
+                                return (
+                                    <th
+                                        key={column}
+                                        className="px-5 py-3 text-xs font-medium uppercase tracking-wide text-zinc-500"
+                                    >
+                                        <button
+                                            type="button"
+                                            onClick={() => handleSort(key)}
+                                            className="flex items-center gap-2 transition-colors hover:text-zinc-200"
+                                        >
+                                            {column}
+
+                                            {isSorted && (
+                                                <span className="text-cyan-400">
+                                                    {sortDirection === "asc"
+                                                        ? "↑"
+                                                        : "↓"}
+                                                </span>
+                                            )}
+                                        </button>
+                                    </th>
+                                );
+                            })}
                         </tr>
                     </thead>
 
