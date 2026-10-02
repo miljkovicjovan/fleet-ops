@@ -84,9 +84,18 @@ function createPopupContent(
     `;
 }
 
-export default function FleetMap() {
+type FleetMapProps = {
+    selectedVesselId: string | null;
+    onVesselSelect: (vesselId: string) => void;
+};
+
+export default function FleetMap({
+    selectedVesselId,
+    onVesselSelect,
+}: FleetMapProps) {
     const mapContainer = useRef<HTMLDivElement | null>(null);
     const map = useRef<mapboxgl.Map | null>(null);
+    const markers = useRef<Map<string, mapboxgl.Marker>>(new Map());
 
     useEffect(() => {
         if (!mapContainer.current || map.current) {
@@ -101,8 +110,14 @@ export default function FleetMap() {
         });
 
         mockVessels.forEach((vessel) => {
+            const markerElement = createVesselMarker(vessel.status);
+
+            markerElement.addEventListener("click", () => {
+                onVesselSelect(vessel.id);
+            });
+
             const marker = new mapboxgl.Marker({
-                element: createVesselMarker(vessel.status),
+                element: markerElement,
             })
                 .setLngLat([vessel.longitude, vessel.latitude])
                 .setPopup(
@@ -124,7 +139,7 @@ export default function FleetMap() {
                 )
                 .addTo(map.current!);
 
-            return marker;
+            markers.current.set(vessel.id, marker);
         });
 
         return () => {
@@ -132,6 +147,43 @@ export default function FleetMap() {
             map.current = null;
         };
     }, []);
+
+    useEffect(() => {
+        if (!map.current || !selectedVesselId) {
+            return;
+        }
+
+        markers.current.forEach((marker, vesselId) => {
+            const element = marker.getElement();
+
+            element.classList.toggle(
+                "fleetops-vessel-marker--selected",
+                vesselId === selectedVesselId
+            );
+        });
+
+        const vessel = mockVessels.find(
+            (vessel) => vessel.id === selectedVesselId
+        );
+
+        const marker = markers.current.get(selectedVesselId);
+
+        if (!vessel || !marker) {
+            return;
+        }
+
+        map.current.flyTo({
+            center: [vessel.longitude, vessel.latitude],
+            zoom: 6,
+            duration: 1000,
+        });
+
+        markers.current.forEach((marker) => {
+            marker.getPopup()?.remove();
+        });
+
+        marker.togglePopup();
+    }, [selectedVesselId]);
 
     return (
         <div className="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900/50">

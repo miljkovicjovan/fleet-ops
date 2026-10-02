@@ -17,6 +17,11 @@ const statusOptions: Array<"all" | VesselStatus> = [
 type SortKey = "name" | "status" | "speed" | "heading" | "lastUpdated";
 type SortDirection = "asc" | "desc";
 
+type VesselListProps = {
+    selectedVesselId?: string | null;
+    onVesselSelect?: (vesselId: string) => void;
+};
+
 function StatusIndicator({ status }: { status: VesselStatus }) {
     const color = {
         active: "bg-cyan-400",
@@ -35,7 +40,10 @@ function StatusIndicator({ status }: { status: VesselStatus }) {
     );
 }
 
-export default function VesselList() {
+export default function VesselList({
+    selectedVesselId,
+    onVesselSelect,
+}: VesselListProps) {
     const [search, setSearch] = useState("");
     const [status, setStatus] = useState<"all" | VesselStatus>("all");
     const [sortKey, setSortKey] = useState<SortKey>("name");
@@ -184,7 +192,11 @@ export default function VesselList() {
                         {filteredVessels.map((vessel) => (
                             <tr
                                 key={vessel.id}
-                                className="transition-colors hover:bg-zinc-800/30"
+                                onClick={() => onVesselSelect?.(vessel.id)}
+                                className={`cursor-pointer transition-colors ${selectedVesselId === vessel.id
+                                    ? "bg-cyan-400/5"
+                                    : "hover:bg-zinc-800/30"
+                                    }`}
                             >
                                 <td className="px-5 py-4">
                                     <Link

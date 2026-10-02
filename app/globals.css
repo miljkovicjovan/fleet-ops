@@ -228,3 +228,25 @@ body {
     font-size: 13px;
     font-weight: 600;
 }
+
+/* Selected vessel marker */
+.fleetops-vessel-marker--selected {
+    z-index: 2;
+}
+
+.fleetops-vessel-marker--selected
+    .fleetops-vessel-marker__ring {
+    width: 32px;
+    height: 32px;
+    border-color: rgb(34 211 238 / 0.8);
+    background: rgb(34 211 238 / 0.18);
+    box-shadow: 0 0 20px rgb(34 211 238 / 0.35);
+}
+
+.fleetops-vessel-marker--selected
+    .fleetops-vessel-marker__dot {
+    width: 12px;
+    height: 12px;
+    background: rgb(34 211 238);
+    box-shadow: 0 0 16px rgb(34 211 238 / 0.8);
+}
