@@ -10,6 +10,7 @@ type RouteContext = {
 };
 
 export async function GET(
+    _request: Request,
     { params }: RouteContext
 ) {
     const session = await auth();
