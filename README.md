@@ -8,6 +8,8 @@ The project focuses on real-world full-stack development concepts including auth
 
 ---
 
+![FleetOps Dashboard](public/dashboard-view.png)
+
 ## Overview
 
 FleetOps provides a centralized dashboard for monitoring a fleet of vessels and understanding their current and historical activity.
